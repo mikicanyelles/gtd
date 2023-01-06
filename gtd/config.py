@@ -96,6 +96,42 @@ def ssh_config_creator(verbose=False):
             return "Successful connection"
 
 
+    def save_config(info, config_file='config.yaml'):
+
+        from os import mkdir
+        from yaml import dump, Dumper
+
+        text = dump(info, Dumper=Dumper)
+
+        pr = input("Do you want to print the file to check if the info is correct (Y/n)? ")
+        if pr.lower() in ('', 'yes', 'y'):
+            print(text)
+        elif pr.lower() in ('no', 'n'):
+            pass
+        else :
+            pass
+
+        try :
+            mkdir('~/.gtd')
+        except FileExistsError:
+            pass
+
+        if path.exists('~/.gtd/' + config_file):
+            overwrite = input("%s already exists, interrupt the execution and rename the file to keep it. Press RETURN to overwrite it.")
+            if overwrite == '':
+                config_file = open('~/.gtd/' + config_file)
+                config_file.write(text)
+                config_file.close()
+
+                return "Config file successfully overwritten in ~/.gtd."
+
+        else :
+            config_file = open('~/.gtd/' + config_file)
+            config_file.write(dump(info, Dumper=Dumper))
+            config_file.close()
+
+            return "Config file successfully saved in ~/.gtd."
+
 
 
     print("Let's start configuring the SSH connection to file.")
@@ -108,6 +144,8 @@ def ssh_config_creator(verbose=False):
     print("Checking SSH connection and creating gtd.db file...")
     ssh_out = check_ssh(info)
     print(ssh_out)
+    print("SSH connection works, saving configuration...")
+    save_config(info)
 
 
 if __name__ == '__main__':

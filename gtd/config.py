@@ -2,14 +2,17 @@ from getpass import getpass
 from os import path
 from sys import exit
 
+
 """
 TODO
-    - [] Save config as yaml in local. Add SSH or local
+    - [X] Save config as yaml in local.
+    - [] Add local configuration
     - [] create db in local
     - [] Encryption of config.yaml in local
     - []
 """
 
+home = str(path.expanduser('~'))
 
 def ssh_config_creator(verbose=False):
     """
@@ -50,11 +53,11 @@ def ssh_config_creator(verbose=False):
         if info['port'] == '':
             info['port'] = "22"
 
-        info['db_path']  = input("Database path in sever [~/.gtd/]: ")
+        info['db_path']  = input("Path to databse in sever [~/.gtd/gtd.db]: ")
         if info['db_path'] == '':
-            info['db_path'] = '~/.gtd/'
-        elif str(info['db_path'])[-1] != '/':
-            info['db_path'] = info['db_path'] + '/'
+            info['db_path'] = '~/.gtd/gtd.db'
+        #elif str(info['db_path'])[-1] != '/':
+        #    info['db_path'] = info['db_path'] + '/'
 
         return info
 
@@ -112,21 +115,21 @@ def ssh_config_creator(verbose=False):
             pass
 
         try :
-            mkdir('~/.gtd')
+            mkdir(home +'/.gtd')
         except FileExistsError:
             pass
 
-        if path.exists('~/.gtd/' + config_file):
-            overwrite = input("%s already exists, interrupt the execution and rename the file to keep it. Press RETURN to overwrite it.")
+        if path.exists(home + '/.gtd/' + config_file):
+            overwrite = input("%s already exists, interrupt the execution and rename the file to keep it. Press RETURN to overwrite it." % config_file)
             if overwrite == '':
-                config_file = open('~/.gtd/' + config_file)
+                config_file = open(home + '/.gtd/' + config_file, 'w')
                 config_file.write(text)
                 config_file.close()
 
                 return "Config file successfully overwritten in ~/.gtd."
 
         else :
-            config_file = open('~/.gtd/' + config_file)
+            config_file = open( home + '/.gtd/' + config_file, 'w')
             config_file.write(dump(info, Dumper=Dumper))
             config_file.close()
 
@@ -140,7 +143,7 @@ def ssh_config_creator(verbose=False):
 
 
     info = ask_ssh()
-    print(info)
+    #print(info)
     print("Checking SSH connection and creating gtd.db file...")
     ssh_out = check_ssh(info)
     print(ssh_out)
